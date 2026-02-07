@@ -27,3 +27,7 @@ A simple Android app that displays random quotes using the [ZenQuotes API](https
 1.  Clone the repository.
 2.  Open the project in Android Studio.
 3.  Build and run the app.
+
+## Download
+
+You can download the latest version of the app from the [GitHub Releases](https://github.com/praja/Quotes/releases) page.
