@@ -30,4 +30,4 @@ A simple Android app that displays random quotes using the [ZenQuotes API](https
 
 ## Download
 
-You can download the latest version of the app from the [GitHub Releases](https://github.com/praja/Quotes/releases) page.
+You can download the latest version of the app from the [GitHub Releases](https://github.com/KaiParker21/Quotes/releases) page.
