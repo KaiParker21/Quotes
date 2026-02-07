@@ -2,6 +2,14 @@
 
 A simple Android app that displays random quotes using the [ZenQuotes API](https://zenquotes.io/).
 
+## Screenshots
+
+| | | 
+| :---: | :---: |
+| <img src="screenshots/Screenshot_20260208_021641_Quotes.jpg" width="250"> | <img src="screenshots/Screenshot_20260208_021815_Quotes.jpg" width="250"> |
+| <img src="screenshots/Screenshot_20260208_021827_Quotes.jpg" width="250"> | <img src="screenshots/Screenshot_20260208_021854_Quotes.jpg" width="250"> |
+| <img src="screenshots/Screenshot_20260208_022544_Quotes.jpg" width="250"> | <img src="screenshots/image0.jpg" width="250"> |
+
 ## Features
 
 *   Fetches and displays a random quote.
