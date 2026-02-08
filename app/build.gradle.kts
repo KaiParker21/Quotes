@@ -37,6 +37,11 @@ android {
 
 dependencies {
 
+    // Icons
+    implementation("androidx.compose.material:material-icons-core:1.7.6")
+    // Or for extended icons:
+    implementation("androidx.compose.material:material-icons-extended:1.7.6")
+
     // Kotlin serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     implementation("androidx.core:core-ktx:1.12.0")

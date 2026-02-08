@@ -24,10 +24,10 @@ import com.skye.quotes.ui.theme.QuotesTheme
 
 @Composable
 fun HomeScreen(
-    quoteUiState: QuoteUiState,
+    randomQuoteUiState: QuoteUiState,
     onRefresh: () -> Unit
 ) {
-    when (quoteUiState) {
+    when (randomQuoteUiState) {
         is QuoteUiState.Loading ->
             LoadingScreen(
                 modifier = Modifier.
@@ -35,14 +35,14 @@ fun HomeScreen(
             )
         is QuoteUiState.Error ->
             ErrorScreen(
-                errorMessage = quoteUiState.error,
+                errorMessage = randomQuoteUiState.error,
                 modifier = Modifier.fillMaxSize(),
                 onRefresh
             )
         is QuoteUiState.Success ->
             QuoteScreen(
                 onRefresh,
-                quoteUiState.quote,
+                randomQuoteUiState.quote,
                 modifier = Modifier
                     .padding(24.dp)
             )

@@ -14,6 +14,7 @@ import com.skye.quotes.QuotesApplication
 import com.skye.quotes.data.QuotesRepository
 import com.skye.quotes.network.Quote
 import kotlinx.coroutines.launch
+import okio.IOException
 
 sealed interface QuoteUiState{
     data class Success(val quote: Quote): QuoteUiState
@@ -26,26 +27,49 @@ class QuoteViewModel(
     private val quotesRepository: QuotesRepository
 ): ViewModel() {
 
-    var quoteUiState: QuoteUiState by mutableStateOf(QuoteUiState.Loading)
+    var randomQuoteUiState: QuoteUiState by mutableStateOf(QuoteUiState.Loading)
         private set
 
-    fun reloadQuote() {
+    var todayQuoteUiState: QuoteUiState by mutableStateOf(QuoteUiState.Loading)
+        private set
+
+    init {
+        getTodayQuote()
         getRandomQuote()
     }
 
-    init {
+    fun reloadQuote() {
+
         getRandomQuote()
     }
 
     fun getRandomQuote() {
         viewModelScope.launch {
-            quoteUiState = QuoteUiState.Loading
+            randomQuoteUiState = QuoteUiState.Loading
             try {
                 val result = quotesRepository.getRandomQuote()
-                quoteUiState = QuoteUiState.Success(result[0])
+                randomQuoteUiState = QuoteUiState.Success(result[0])
+            } catch (e: IOException) {
+                randomQuoteUiState = QuoteUiState.Error("Network error: ${e.message ?: "Couldn't get quote"}")
             } catch (e: Exception) {
-                quoteUiState = QuoteUiState.Error(e.message.toString())
-                Log.e("HomeScreenViewModel", e.message.toString())
+                randomQuoteUiState = QuoteUiState.Error("Error: ${e.message ?: "Unknown error occurred"}")
+            }
+        }
+    }
+
+    fun getTodayQuote() {
+        viewModelScope.launch {
+            todayQuoteUiState = QuoteUiState.Loading
+            try {
+                Log.d("QuoteViewModel", "Fetching today's quote")
+                val result = quotesRepository.getTodayQuote()
+                Log.d("QuoteViewModel", "Today's quote fetched: $result")
+                todayQuoteUiState = QuoteUiState.Success(quote = result[0])
+                Log.d("QuoteViewModel", "Today's quote UI state updated: $todayQuoteUiState")
+            } catch (e: IOException) {
+                todayQuoteUiState = QuoteUiState.Error("Network error: ${e.message ?: "Couldn't get quote"}")
+            } catch (e: Exception) {
+                todayQuoteUiState = QuoteUiState.Error("Error: ${e.message ?: "Unknown error occurred"}")
             }
         }
     }
