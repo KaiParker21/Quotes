@@ -82,32 +82,23 @@ https://github.com/KaiParker21/Quotes/releases
 
 ## 📜 Changelog
 
-### v1.2.0 – UI Refinement & Widget Support
+### v1.1.0 – Widget Support & UI Refinement
 
 - Added home screen widget with refresh functionality
 - Implemented Quote of the Day section
 - Added rate limit handling with countdown UI
-- Context-aware error theming (AppBar + content surfaces)
-- Large collapsing TopAppBar with proper scroll behavior
-- Consistent collapsed/expanded color handling
+- Context-aware error theming
+- Large collapsing TopAppBar
 - Improved dark mode tonal layering
 - Refined typography hierarchy
-- Improved FAB disabled state styling
 - Layout and spacing refinements
-
----
-
-### v1.1.0 – Stability & UI Improvements
-
-- Enhanced error handling
-- Improved UI state management using sealed classes
-- Material 3 styling refinements
-- Minor layout improvements
 
 ---
 
 ### v1.0.0 – Initial Release
 
 - Fetch and display random quotes
-- Basic dark mode support
-- Initial Material 3 UI
+- Basic Material 3 UI
+- Dark mode support
+
+
