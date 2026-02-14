@@ -1,6 +1,5 @@
 package com.skye.quotes.presentation.screens.homeScreen
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,13 +12,17 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.skye.quotes.QuotesApplication
 import com.skye.quotes.data.QuotesRepository
 import com.skye.quotes.network.Quote
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okio.IOException
+import retrofit2.HttpException
 
 sealed interface QuoteUiState{
     data class Success(val quote: Quote): QuoteUiState
     object Loading: QuoteUiState
     data class Error(val error: String): QuoteUiState
+    data class RateLimited(val secondsRemaining: Int) : QuoteUiState
 }
 
 
@@ -32,6 +35,8 @@ class QuoteViewModel(
 
     var todayQuoteUiState: QuoteUiState by mutableStateOf(QuoteUiState.Loading)
         private set
+
+    private var countdownJob: Job? = null
 
     init {
         getTodayQuote()
@@ -47,32 +52,60 @@ class QuoteViewModel(
         viewModelScope.launch {
             randomQuoteUiState = QuoteUiState.Loading
             try {
-                val result = quotesRepository.getRandomQuote()
-                randomQuoteUiState = QuoteUiState.Success(result[0])
-            } catch (e: IOException) {
-                randomQuoteUiState = QuoteUiState.Error("Network error: ${e.message ?: "Couldn't get quote"}")
-            } catch (e: Exception) {
-                randomQuoteUiState = QuoteUiState.Error("Error: ${e.message ?: "Unknown error occurred"}")
+                val quotes = quotesRepository.getRandomQuote()
+                val quote = quotes.firstOrNull()
+                    ?: throw IllegalStateException("Empty response")
+                randomQuoteUiState = QuoteUiState.Success(quote)
+            } catch (e: HttpException) {
+                if (e.code() == 429) {
+                    handleRateLimit()
+                    return@launch
+                }
+                randomQuoteUiState =
+                    QuoteUiState.Error("Server error (${e.code()})")
+            } catch (_: IOException) {
+                randomQuoteUiState =
+                    QuoteUiState.Error("Network connection problem")
+            } catch (_: Exception) {
+                randomQuoteUiState =
+                    QuoteUiState.Error("Unexpected error occurred")
             }
         }
     }
+
 
     fun getTodayQuote() {
         viewModelScope.launch {
             todayQuoteUiState = QuoteUiState.Loading
             try {
-                Log.d("QuoteViewModel", "Fetching today's quote")
-                val result = quotesRepository.getTodayQuote()
-                Log.d("QuoteViewModel", "Today's quote fetched: $result")
-                todayQuoteUiState = QuoteUiState.Success(quote = result[0])
-                Log.d("QuoteViewModel", "Today's quote UI state updated: $todayQuoteUiState")
-            } catch (e: IOException) {
-                todayQuoteUiState = QuoteUiState.Error("Network error: ${e.message ?: "Couldn't get quote"}")
-            } catch (e: Exception) {
-                todayQuoteUiState = QuoteUiState.Error("Error: ${e.message ?: "Unknown error occurred"}")
+                val quotes = quotesRepository.getTodayQuote()
+                val quote = quotes.firstOrNull()
+                    ?: throw IllegalStateException("Empty response")
+                todayQuoteUiState = QuoteUiState.Success(quote)
+            } catch (_: IOException) {
+                todayQuoteUiState =
+                    QuoteUiState.Error("Network connection problem")
+            } catch (_: Exception) {
+                todayQuoteUiState =
+                    QuoteUiState.Error("Something went wrong")
             }
         }
     }
+
+
+    private fun handleRateLimit() {
+        countdownJob?.cancel()
+
+        countdownJob = viewModelScope.launch {
+            for (i in 30 downTo 1) {
+                randomQuoteUiState = QuoteUiState.RateLimited(i)
+                delay(1000)
+            }
+
+            getRandomQuote()
+        }
+    }
+
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
